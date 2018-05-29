@@ -16,7 +16,7 @@ const bookSchema = mongoose.Schema(
 		},
 		pages: {
 			type: Number,
-			default: 'N/A'
+			default: 0
 		},
 		rating: {
 			type: Number,
