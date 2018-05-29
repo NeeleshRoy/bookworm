@@ -26,6 +26,20 @@ app.get('/api/getbook', (req, res) => {
 	});
 });
 
+app.get('/api/books', (req, res) => {
+	const skip = parseInt(req.query.skip);
+	const limit = parseInt(req.query.limit);
+	const order = req.query.order;
+
+	Book.find().skip(skip).sort({ _id: order }).limit(limit).exec((err, doc) => {
+		if (err) {
+			return res.status(400).send(err);
+		}
+
+		res.send(doc);
+	});
+});
+
 //POST
 app.post('/api/book', (req, res) => {
 	const book = new Book(req.body);
@@ -42,6 +56,19 @@ app.post('/api/book', (req, res) => {
 });
 
 //UPDATE
+
+app.post('/api/updatebook', (req, res) => {
+	Book.findByIdAndUpdate(req.body._id, req.body, { new: true }, (err, doc) => {
+		if (err) {
+			return res.status(400).send(err);
+		}
+
+		res.json({
+			success: true,
+			data: doc
+		});
+	});
+});
 
 //DELETE
 
