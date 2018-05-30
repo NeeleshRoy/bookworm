@@ -5,17 +5,17 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const config = require('./config/config').get(process.env.NODE_ENV);
 const app = express();
-const { BookRoutes } = require('./routes');
+const { BookRoutes, UserRoutes } = require('./routes');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.DATABASE);
 
-const { User } = require('./models/User');
-
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
 app.use('/api/books', BookRoutes);
+app.use('/api/user', UserRoutes);
 
 const PORT = process.env.PORT || 3001;
 
