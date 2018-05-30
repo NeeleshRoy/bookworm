@@ -19,4 +19,22 @@ Router.post('/register', (req, res) => {
 	});
 });
 
+Router.post('/login', (req, res) => {
+	User.findOne({ email: req.body.email }, (err, user) => {
+		if (!user) return res.json({ isAuth: false, message: 'Invalid email' });
+		user.comparePassword(req.body.password, (err, isMatch) => {
+			if (!isMatch) return res.json({ isAuth: false, message: 'Wrong Password' });
+
+			user.generateToken((err, user) => {
+				if (err) return res.status(404).send(err);
+				res.cookie('auth', user.token).json({
+					isAuth: true,
+					id: user._id,
+					email: user.email
+				});
+			});
+		});
+	});
+});
+
 module.exports = Router;
