@@ -2,9 +2,18 @@ const express = require('express');
 const Router = express.Router();
 
 const { User } = require('../models/User');
+const { Book } = require('../models/Book');
+const { auth } = require('../middleware/auth');
 
 Router.use((req, res, next) => {
 	next();
+});
+
+Router.get('/users', (req, res) => {
+	User.find({}, (err, users) => {
+		if (err) return res.json({ success: false });
+		res.status(200).send(users);
+	});
 });
 
 Router.post('/register', (req, res) => {
@@ -34,6 +43,32 @@ Router.post('/login', (req, res) => {
 				});
 			});
 		});
+	});
+});
+
+Router.get(
+	'/logout',
+	(req, res, next) => {
+		auth(req, res, next);
+	},
+	(req, res) => {
+		res.send(req.user);
+	}
+);
+
+Router.get('/reviewer', (req, res) => {
+	const id = req.query.id;
+
+	User.findById(id, (err, doc) => {
+		if (err) return res.status(404).send(err);
+		res.json({ name: doc.name, lastname: doc.lastname });
+	});
+});
+
+Router.get('/reviews', (req, res) => {
+	Book.find({ ownerId: req.query.user }).exec((err, docs) => {
+		if (err) return res.status(404).send(err);
+		res.send(docs);
 	});
 });
 

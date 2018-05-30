@@ -58,7 +58,6 @@ userSchema.pre('save', function(next) {
 });
 
 userSchema.methods.comparePassword = function(candidatePassword, cb) {
-	console.log(candidatePassword, this.password);
 	bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
 		if (err) return cb(err);
 		cb(null, isMatch);
@@ -74,6 +73,17 @@ userSchema.methods.generateToken = function(cb) {
 	user.save(function(err, user) {
 		if (err) return cb(err);
 		cb(null, user);
+	});
+};
+
+userSchema.statics.findByToken = function(token, cb) {
+	const user = this;
+	jwt.verify(token, config.SECRET, function(err, decode) {
+		if (err) return cb(err);
+		user.findOne({ _id: decode, token: token }, function(err, user) {
+			if (err) return cb(err);
+			cb(null, user);
+		});
 	});
 };
 
