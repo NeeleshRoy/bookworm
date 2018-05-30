@@ -76,6 +76,14 @@ userSchema.methods.generateToken = function(cb) {
 	});
 };
 
+userSchema.methods.deleteToken = function(token, cb) {
+	const user = this;
+	user.update({ $unset: { token: 1 } }, (err, user) => {
+		if (err) return cb(err);
+		return cb(null, user);
+	});
+};
+
 userSchema.statics.findByToken = function(token, cb) {
 	const user = this;
 	jwt.verify(token, config.SECRET, function(err, decode) {

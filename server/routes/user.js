@@ -9,6 +9,22 @@ Router.use((req, res, next) => {
 	next();
 });
 
+Router.get(
+	'/auth',
+	(req, res, next) => {
+		auth(req, res, next);
+	},
+	(req, res) => {
+		res.json({
+			isAuth: true,
+			id: req.user._id,
+			email: req.user.email,
+			name: req.user.name,
+			lastname: req.user.lastname
+		});
+	}
+);
+
 Router.get('/users', (req, res) => {
 	User.find({}, (err, users) => {
 		if (err) return res.json({ success: false });
@@ -52,7 +68,10 @@ Router.get(
 		auth(req, res, next);
 	},
 	(req, res) => {
-		res.send(req.user);
+		req.user.deleteToken(req.token, (err, user) => {
+			if (err) return res.status(404).send(err);
+			res.status(200).send({ success: true });
+		});
 	}
 );
 
